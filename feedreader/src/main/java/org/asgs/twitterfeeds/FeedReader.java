@@ -16,7 +16,22 @@ package org.asgs.twitterfeeds;
  import java.util.concurrent.LinkedBlockingQueue;
  import java.util.concurrent.TimeUnit;
 
+ import org.apache.http.HttpHeaders;
+ import org.apache.http.client.methods.HttpUriRequest;
+
  public class FeedReader {
+
+   private static class LoggingOAuth1 extends OAuth1 {
+     public LoggingOAuth1(String consumerKey, String consumerSecret, String token, String secret) {
+       super(consumerKey, consumerSecret, token, secret);
+     }
+     @Override
+     public void signRequest(HttpUriRequest request, String postParams) {
+       super.signRequest(request, postParams);
+       System.out.println("URL invoked is " + request.getURI());
+       System.out.println("Authorization header value is " + request.getFirstHeader(HttpHeaders.AUTHORIZATION));
+     }
+   }
 
    public static void run(String consumerKey, String consumerSecret, String token, String secret) throws InterruptedException {
      // Create an appropriately sized blocking queue
@@ -27,7 +42,7 @@ package org.asgs.twitterfeeds;
      StatusesSampleEndpoint endpoint = new StatusesSampleEndpoint();
      endpoint.stallWarnings(false);
 
-     Authentication auth = new OAuth1(consumerKey, consumerSecret, token, secret);
+     Authentication auth = new LoggingOAuth1(consumerKey, consumerSecret, token, secret);
 
      // Create a new BasicClient. By default gzip is enabled.
      BasicClient client = new ClientBuilder()
