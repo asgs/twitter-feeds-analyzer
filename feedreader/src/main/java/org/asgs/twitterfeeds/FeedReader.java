@@ -28,7 +28,6 @@ package org.asgs.twitterfeeds;
      endpoint.stallWarnings(false);
 
      Authentication auth = new OAuth1(consumerKey, consumerSecret, token, secret);
-     //Authentication auth = new com.twitter.hbc.httpclient.auth.BasicAuth(username, password);
 
      // Create a new BasicClient. By default gzip is enabled.
      BasicClient client = new ClientBuilder()
@@ -65,6 +64,10 @@ package org.asgs.twitterfeeds;
    }
 
    public static void main(String[] args) {
+     if (args.length != 4) {
+       System.err.println("Incorrect Usage: Pass the consumerKey, consumerSecret, token, secret as arguments.");
+       return;
+     }
      try {
        FeedReader.run(args[0], args[1], args[2], args[3]);
      } catch (InterruptedException e) {
