@@ -6,15 +6,22 @@ This is only to understand some techniques related to data processing, especiall
 <ul>
 <li>
 
-<i>Feed Reader</i> - This connects to the Twitter API and reads the feeds based on some criteria (like hashtags, people's names, etc., which don't really matter). Those feeds will be put on a message queuing system like Kafka and persisted into a Database (like PostGresql).
+<i>Feed Reader</i> - This connects to the Twitter API and reads the feeds based on some criteria (like hashtags, people's names, etc., which don't really matter). Those feeds will be put on a Kafka topic. This serves as the "raw" data that will be further processed as necessary.
 
 </li>
 
 <li>
 
-<i>Feed Stats</i> - This will process the feeds from the Database and generate the stats; which will ultimately be fed to the front-end
+<i>Feed Processor</i> - This will process the feeds from the Kafkat topic and transform into some concrete structure and push to another topic; This could be subscribed by various datastores for persistent storage.
 
 </li>
+
+<li>
+
+<i>Feed Querier</i> - This will most likely be a REST API to serve queries fired from a UI; It will in turn query the database and return results
+
+</li>
+</ul>
 
 <b>Status</b>
 This is a work-in-progress. The components mentioned above may not be retained (or more components could be added as well). 

@@ -11,6 +11,13 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * A Kafka client which will manage publish, subscribe mechanisms relating to
+ * Tweets. It's intended to be instantiated on a per-topic basis. The topic
+ * information along with all other Kafka cluster-specific information will
+ * need to be made available within the properties instance provided during
+ * the construction of the client.
+ */
 public class TwitterKafkaClient {
 
   private Producer<String, String> producer;
