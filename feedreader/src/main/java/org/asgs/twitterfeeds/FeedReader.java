@@ -12,6 +12,9 @@ import com.twitter.hbc.httpclient.BasicClient;
 import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
 
+import java.io.IOException;
+
+import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +37,7 @@ public class FeedReader {
     }
   }
 
-  public static void run(String consumerKey, String consumerSecret, String token, String secret) throws InterruptedException {
+  public void readTweets(String consumerKey, String consumerSecret, String token, String secret) throws InterruptedException, IOException {
     // Create an appropriately sized blocking queue
     BlockingQueue<String> queue = new LinkedBlockingQueue<String>(10000);
 
@@ -57,6 +60,8 @@ public class FeedReader {
     // Establish a connection
     client.connect();
 
+    TwitterKafkaClient kafkaClient = new TwitterKafkaClient(getKafkaClusterProps());
+
     for (int msgRead = 0; msgRead < 1000; msgRead++) {
      if (client.isDone()) {
        System.out.println("Client connection closed unexpectedly: " + client.getExitEvent().getMessage());
@@ -68,6 +73,7 @@ public class FeedReader {
        System.out.println("Did not receive a message in 5 seconds");
      } else {
        System.out.println("Twitter feed received - " + msg);
+       kafkaClient.publish(msg);
      }
     }
 
@@ -78,12 +84,27 @@ public class FeedReader {
     // Timezone, Tweet Language, followers_count
   }
 
-  public static void main(String[] args) throws InterruptedException {
+  public static void main(String[] args) throws InterruptedException, IOException {
     if (args.length != 4) {
       System.err.println("Incorrect Usage: Pass the consumerKey, consumerSecret, token, secret as arguments.");
       return;
     }
 
-    FeedReader.run(args[0], args[1], args[2], args[3]);
+    FeedReader reader = new FeedReader();
+    reader.readTweets(args[0], args[1], args[2], args[3]);
+  }
+
+  private Properties getKafkaClusterProps() {
+    Properties properties = new Properties();
+    properties.put("bootstrap.servers", "localhost:9092");
+    properties.put("acks", "all");
+    properties.put("retries", 0);
+    properties.put("batch.size", 16384);
+    properties.put("linger.ms", 1);
+    properties.put("buffer.memory", 33554432);
+    properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+    properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+    properties.put("topic", "tweet-stream");
+    return properties;
   }
 }
