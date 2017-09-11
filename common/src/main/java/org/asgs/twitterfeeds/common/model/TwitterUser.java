@@ -1,7 +1,9 @@
 package org.asgs.twitterfeeds.common.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class TwitterUser {
 
   private String location;
@@ -17,5 +19,10 @@ public class TwitterUser {
 
   @JsonProperty(value="lang")
   private String language;
+
+  @Override
+  public String toString() {
+    return "[location=" + location + ";followers_count="+ followersCount + ";friends_count=" + friendsCount + "statuses_count=" + statusesCount + "lang=" + language + "]";
+  }
 
 }

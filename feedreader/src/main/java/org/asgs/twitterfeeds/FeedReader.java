@@ -4,6 +4,9 @@ package org.asgs.twitterfeeds;
  * Code adapted from https://github.com/twitter/hbc/tree/master/hbc-example
  *
  */
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.twitter.hbc.ClientBuilder;
 import com.twitter.hbc.core.Constants;
 import com.twitter.hbc.core.endpoint.StatusesSampleEndpoint;
@@ -14,6 +17,7 @@ import com.twitter.hbc.httpclient.auth.OAuth1;
 
 import java.io.IOException;
 
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -62,7 +66,9 @@ public class FeedReader {
     // Establish a connection
     client.connect();
 
-    TwitterKafkaClient kafkaClient = new TwitterKafkaClient(getKafkaClusterProps());
+    TwitterKafkaClient<String, String> kafkaClient = new TwitterKafkaClient<>(getKafkaClusterProps());
+
+    ObjectMapper mapper = new ObjectMapper();
 
     for (int msgRead = 0; msgRead < 1000; msgRead++) {
      if (client.isDone()) {
@@ -75,7 +81,8 @@ public class FeedReader {
        System.out.println("Did not receive a message in 5 seconds");
      } else {
        System.out.println("Twitter feed received - " + msg);
-       kafkaClient.publish(msg);
+       Map<?, ?> tree = mapper.readValue(msg, Map.class);
+       kafkaClient.publish((String) tree.get("id_str"), msg);
      }
     }
 
@@ -106,6 +113,8 @@ public class FeedReader {
     properties.put("buffer.memory", 33554432);
     properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
     properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+    properties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+    properties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     properties.put("producer-topic", "tweet-stream");
     return properties;
   }

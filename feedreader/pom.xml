@@ -40,6 +40,12 @@
   </build>
   <dependencies>
     <dependency>
+      <groupId>org.asgs.twitterfeeds</groupId>
+      <artifactId>common</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.twitter</groupId>
       <artifactId>hbc-core</artifactId>
       <version>2.2.0</version>

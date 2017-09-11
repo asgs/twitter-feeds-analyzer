@@ -1,7 +1,5 @@
 package org.asgs.twitterfeeds.common.clients;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -27,39 +25,39 @@ import java.util.stream.Collectors;
  * need to be made available within the properties instance provided during
  * the construction of the client.
  */
-public class TwitterKafkaClient {
+public class TwitterKafkaClient<K, V> {
 
-  private Producer<String, String> producer;
-  private Consumer<String, String> consumer;
-  private ObjectMapper mapper = new ObjectMapper();
+  private Producer<K, V> producer;
+  private Consumer<K, V> consumer;
   private String kafkaProducerTopic;
-  private String KafkaConsumerTopic;
+  private String kafkaConsumerTopic;
 
   public TwitterKafkaClient(Properties properties) {
     producer = new KafkaProducer<>(properties);
     consumer = new KafkaConsumer<>(properties);
     kafkaProducerTopic = (String) properties.get("producer-topic");
-    KafkaConsumerTopic = (String) properties.get("consumer-topic");
-    consumer.subscribe(Arrays.asList(KafkaConsumerTopic));
+    kafkaConsumerTopic = (String) properties.get("consumer-topic");
+    if (kafkaConsumerTopic != null) {
+      consumer.subscribe(Arrays.asList(kafkaConsumerTopic));
+      System.out.println("subscribed to topic " + kafkaConsumerTopic);
+    }
   }
 
-  public void publish(String tweet) throws IOException {
-    Map<?, ?> tree = mapper.readValue(tweet, Map.class);
-    String key = (String) tree.get("id_str");
-    String value = tweet;
+  public void publish(K key, V value) throws IOException {
     producer.send(createRecord(key, value));
   }
 
-  public Collection<String> subscribe() {
-    ConsumerRecords<String, String> records = consumer.poll(5000);
-    Stream.Builder<String> builder = null;
-    for (ConsumerRecord<String, String> record : records) {
-      builder = builder.add(record.value());
+  public Collection<V> subscribe() {
+    ConsumerRecords<K, V> records = consumer.poll(15000);
+    System.out.println("Received records - " + records);
+    Stream.Builder<V> builder = Stream.builder();
+    for (ConsumerRecord<K, V> record : records) {
+      builder.add(record.value());
     }
     return builder.build().collect(Collectors.toList());
   }
 
-  private ProducerRecord<String, String> createRecord(String key, String value) {
+  private ProducerRecord<K, V> createRecord(K key, V value) {
     return new ProducerRecord<>(kafkaProducerTopic, key, value);
   }
 }
