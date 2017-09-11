@@ -17,9 +17,8 @@ public class TwitterFeedDeserializer implements Deserializer<TwitterFeed> {
   @Override
   public TwitterFeed deserialize(String topic, byte[] data) {
     try {
-      System.out.println("Received data for deser " + new String(data));
     return mapper.readValue(data, TwitterFeed.class);
-  } catch (IOException e) {
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }

@@ -49,7 +49,6 @@ public class TwitterKafkaClient<K, V> {
 
   public Collection<V> subscribe() {
     ConsumerRecords<K, V> records = consumer.poll(15000);
-    System.out.println("Received records - " + records);
     Stream.Builder<V> builder = Stream.builder();
     for (ConsumerRecord<K, V> record : records) {
       builder.add(record.value());

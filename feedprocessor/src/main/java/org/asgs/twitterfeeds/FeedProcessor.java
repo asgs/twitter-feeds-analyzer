@@ -10,8 +10,7 @@ public class FeedProcessor {
 
   public void processTweets() {
     TwitterKafkaClient<String, TwitterFeed> readingClient = new TwitterKafkaClient<>(getKafkaClusterPropsForIngestion());
-    Collection<TwitterFeed> feeds = readingClient.subscribe();
-    System.out.println("Received feeds of size " + feeds.size());    
+    readingClient.subscribe().stream().forEach(System.out::println);
   }
 
   public static void main(String[] args) {
