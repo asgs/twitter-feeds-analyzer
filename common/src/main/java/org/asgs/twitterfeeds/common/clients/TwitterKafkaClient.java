@@ -43,8 +43,12 @@ public class TwitterKafkaClient<K, V> {
     }
   }
 
-  public void publish(K key, V value) throws IOException {
-    producer.send(createRecord(key, value));
+  public void publish(K key, V value) {
+    try {
+      producer.send(createRecord(key, value));
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public Collection<V> subscribe() {

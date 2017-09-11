@@ -1,7 +1,9 @@
 package org.asgs.twitterfeeds;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Properties;
+
 
 import org.asgs.twitterfeeds.common.clients.TwitterKafkaClient;
 import org.asgs.twitterfeeds.common.model.TwitterFeed;
@@ -9,8 +11,10 @@ import org.asgs.twitterfeeds.common.model.TwitterFeed;
 public class FeedProcessor {
 
   public void processTweets() {
-    TwitterKafkaClient<String, TwitterFeed> readingClient = new TwitterKafkaClient<>(getKafkaClusterPropsForIngestion());
-    readingClient.subscribe().stream().forEach(System.out::println);
+    TwitterKafkaClient<String, TwitterFeed> consumer = new TwitterKafkaClient<>(getKafkaClusterPropsForIngestion());
+
+    TwitterKafkaClient<String, TwitterFeed> publisher = new TwitterKafkaClient<>(getKafkaClusterPropsForIngestion());
+    consumer.subscribe().stream().forEach(e -> publisher.publish(e.getTweetId(), e));
   }
 
   public static void main(String[] args) {

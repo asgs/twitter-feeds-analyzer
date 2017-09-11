@@ -20,6 +20,10 @@ public class TwitterFeed {
 
   private TwitterUser user;
 
+  public String getTweetId() {
+    return tweetId;
+  }
+
   @Override
   public String toString() {
     return "[id_str=" + tweetId + ";tweet="+ tweet + ";tweetLanguage=" + tweetLanguage + "timestamp=" + timestamp + "user=" + user + "]";
