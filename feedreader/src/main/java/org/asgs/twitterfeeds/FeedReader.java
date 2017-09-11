@@ -106,7 +106,7 @@ public class FeedReader {
     properties.put("buffer.memory", 33554432);
     properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
     properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-    properties.put("topic", "tweet-stream");
+    properties.put("producer-topic", "tweet-stream");
     return properties;
   }
 }

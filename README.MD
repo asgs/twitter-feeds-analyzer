@@ -18,7 +18,7 @@ This is only to understand some techniques related to data processing, especiall
 
 <li>
 
-<i>Feed Querier</i> - This will most likely be a REST API to serve queries fired from a UI; It will in turn query the database and return results
+<i>Feed Querier</i> - This will most likely be a REST API to serve queries fired from a UI; It will in turn query the database and/or the topic (which contains the processed feeds data) and return results
 
 </li>
 </ul>
