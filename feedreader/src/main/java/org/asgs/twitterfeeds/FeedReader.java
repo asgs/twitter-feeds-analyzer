@@ -22,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.HttpUriRequest;
 
+import org.asgs.twitterfeeds.common.clients.TwitterKafkaClient;
+
 public class FeedReader {
 
   private static class LoggingOAuth1 extends OAuth1 {
