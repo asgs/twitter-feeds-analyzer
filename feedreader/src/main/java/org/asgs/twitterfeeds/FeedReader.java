@@ -30,19 +30,6 @@ import org.asgs.twitterfeeds.common.clients.KafkaClient;
 
 public class FeedReader {
 
-  private static class LoggingOAuth1 extends OAuth1 {
-    public LoggingOAuth1(String consumerKey, String consumerSecret, String token, String secret) {
-       super(consumerKey, consumerSecret, token, secret);
-    }
-
-    @Override
-    public void signRequest(HttpUriRequest request, String postParams) {
-      super.signRequest(request, postParams);
-      System.out.println("URL invoked is " + request.getURI());
-      System.out.println("Authorization header value is " + request.getFirstHeader(HttpHeaders.AUTHORIZATION));
-    }
-  }
-
   public void readTweets(String consumerKey, String consumerSecret, String token, String secret) throws InterruptedException, IOException {
     // Create an appropriately sized blocking queue
     BlockingQueue<String> queue = new LinkedBlockingQueue<String>(10000);
@@ -52,7 +39,7 @@ public class FeedReader {
     StatusesSampleEndpoint endpoint = new StatusesSampleEndpoint();
     endpoint.stallWarnings(false);
 
-    Authentication auth = new LoggingOAuth1(consumerKey, consumerSecret, token, secret);
+    Authentication auth = new OAuth1(consumerKey, consumerSecret, token, secret);
 
     // Create a new BasicClient. By default gzip is enabled.
     BasicClient client = new ClientBuilder()
