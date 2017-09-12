@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.HttpUriRequest;
 
-import org.asgs.twitterfeeds.common.clients.TwitterKafkaClient;
+import org.asgs.twitterfeeds.common.clients.KafkaClient;
 
 public class FeedReader {
 
@@ -66,7 +66,7 @@ public class FeedReader {
     // Establish a connection
     client.connect();
 
-    TwitterKafkaClient<String, String> kafkaClient = new TwitterKafkaClient<>(getKafkaClusterProps());
+    KafkaClient<String, String> kafkaClient = new KafkaClient<>(getKafkaClusterProps());
 
     ObjectMapper mapper = new ObjectMapper();
 

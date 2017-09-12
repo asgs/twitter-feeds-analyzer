@@ -25,14 +25,14 @@ import java.util.stream.Collectors;
  * need to be made available within the properties instance provided during
  * the construction of the client.
  */
-public class TwitterKafkaClient<K, V> {
+public class KafkaClient<K, V> {
 
   private Producer<K, V> producer;
   private Consumer<K, V> consumer;
   private String kafkaProducerTopic;
   private String kafkaConsumerTopic;
 
-  public TwitterKafkaClient(Properties properties) {
+  public KafkaClient(Properties properties) {
     producer = new KafkaProducer<>(properties);
     consumer = new KafkaConsumer<>(properties);
     kafkaProducerTopic = (String) properties.get("producer-topic");
@@ -52,7 +52,7 @@ public class TwitterKafkaClient<K, V> {
   }
 
   public Collection<V> subscribe() {
-    ConsumerRecords<K, V> records = consumer.poll(15000);
+    ConsumerRecords<K, V> records = consumer.poll(5000);
     Stream.Builder<V> builder = Stream.builder();
     for (ConsumerRecord<K, V> record : records) {
       builder.add(record.value());
