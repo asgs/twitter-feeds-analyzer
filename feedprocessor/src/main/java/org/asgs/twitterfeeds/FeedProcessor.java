@@ -14,7 +14,10 @@ public class FeedProcessor {
     KafkaClient<String, TwitterFeed> consumer = new KafkaClient<>(getKafkaClusterPropsForIngestion());
 
     KafkaClient<String, TwitterFeed> publisher = new KafkaClient<>(getKafkaClusterPropsForIngestion());
-    consumer.subscribe().stream().forEach(e -> publisher.publish(e.getTweetId(), e));
+    consumer.subscribe().stream().forEach(e -> {
+      System.out.println("Processed tweet with Id " + e.getTweetId());
+      publisher.publish(e.getTweetId(), e);
+    });
   }
 
   public static void main(String[] args) {

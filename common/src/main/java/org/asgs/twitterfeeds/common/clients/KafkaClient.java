@@ -52,11 +52,18 @@ public class KafkaClient<K, V> {
   }
 
   public Collection<V> subscribe() {
-    ConsumerRecords<K, V> records = consumer.poll(5000);
     Stream.Builder<V> builder = Stream.builder();
-    for (ConsumerRecord<K, V> record : records) {
-      builder.add(record.value());
+    while (true) {
+      ConsumerRecords<K, V> records = consumer.poll(5000);
+      if (records.isEmpty()) {
+        break;
+      }
+      for (ConsumerRecord<K, V> record : records) {
+        builder.add(record.value());
+        consumer.commitAsync();
+      }
     }
+
     return builder.build().collect(Collectors.toList());
   }
 
