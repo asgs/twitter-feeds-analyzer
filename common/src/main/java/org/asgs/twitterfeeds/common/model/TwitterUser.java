@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class TwitterUser {
 
+  @JsonProperty(value="id_str")
+  private String id;
+
   private String location;
 
   @JsonProperty(value="followers_count")
