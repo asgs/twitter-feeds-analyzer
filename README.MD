@@ -23,6 +23,29 @@ This is only to understand some techniques related to data processing, especiall
 </li>
 </ul>
 
+## Setup
+
+This project currently requires [Apache Kafka](http://kafka.apache.org/quickstart)(for messaging communications), [Apache Zookeeper](https://zookeeper.apache.org)(for distributed co-ordination of services like Kafka). The host, port number, Kafka topic details are *currently* hardcoded in the respective project modules as a Java `Properties` instance. So if you would like to deviate from the defaults, feel free to do so.
+
+## Build and Run
+
+Make sure the Zookeeper and Kafka services are running and their details are configured.
+
+<ul>
+<li>
+
+To run the Feed Reader, run the command `mvn -e clean package && java -jar target/feedreader-1.0-SNAPSHOT.jar <consumer_key> <consumer_secret> <access_token> <access_token_secret`
+
+</li>
+
+<li>
+
+To run the Feed Processor, run the command `mvn -e clean package && java -jar target/feedprocessor-1.0-SNAPSHOT.jar`
+
+</li>
+</ul>
+
 <b>Status</b>
+
 This is a work-in-progress. The components mentioned above may not be retained (or more components could be added as well). 
 
