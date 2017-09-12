@@ -24,6 +24,22 @@ public class TwitterFeed {
     return tweetId;
   }
 
+  public String getTweet() {
+    return tweet;
+  }
+
+  public String getTweetLanguage() {
+    return tweetLanguage;
+  }
+
+  public long getTimestamp() {
+    return timestamp;
+  }
+
+  public TwitterUser getUser() {
+    return user;
+  }
+
   @Override
   public String toString() {
     return "[id_str=" + tweetId + ";tweet="+ tweet + ";tweetLanguage=" + tweetLanguage + "timestamp=" + timestamp + "user=" + user + "]";

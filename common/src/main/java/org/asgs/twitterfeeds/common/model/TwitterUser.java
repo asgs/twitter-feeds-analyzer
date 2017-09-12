@@ -23,6 +23,30 @@ public class TwitterUser {
   @JsonProperty(value="lang")
   private String language;
 
+  public String getId() {
+    return id;
+  }
+
+  public String getLocation() {
+    return location;
+  }
+
+  public int getFollowersCount() {
+    return followersCount;
+  }
+
+  public int getFriendsCount() {
+    return friendsCount;
+  }
+
+  public int getStatusesCount() {
+    return statusesCount;
+  }
+
+  public String getLanguage() {
+    return language;
+  }
+
   @Override
   public String toString() {
     return "[location=" + location + ";followers_count="+ followersCount + ";friends_count=" + friendsCount + "statuses_count=" + statusesCount + "lang=" + language + "]";
