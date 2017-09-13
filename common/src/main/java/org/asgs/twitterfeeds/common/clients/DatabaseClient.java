@@ -19,10 +19,12 @@ public class DatabaseClient {
 
   public DatabaseClient(DataSource dataSource) {
     this.dataSource = dataSource;
+    System.out.println("Initializing JDBI with dataSource " + dataSource);
     this.dbi = new DBI(dataSource);
   }
 
   public void saveTweet(TwitterFeed tweet) {
+    System.out.println("Request to Insert new tweet with id " + tweet.getTweetId());
     Handle h = dbi.open();
     TwitterUser user = tweet.getUser();
     // Check if user exists in DB, else insert the user first.
@@ -32,9 +34,11 @@ public class DatabaseClient {
                  .first();
     if (id == null) { // User is not added to the DB yet.
       h.execute("insert into tweeter values (?, ?, ?, ?, ?)", user.getId(), user.getLocation(), user.getFollowersCount(), user.getFriendsCount(), user.getStatusesCount());
+      System.out.println("Inserted new user with id " + user.getId());
     }
     // Now insert the tweet coupling it to the said user.
     h.execute("insert into tweet values (?, ?, ?, ?, ?)", tweet.getTweetId(), tweet.getTweet(), tweet.getTweetLanguage(), tweet.getTimestamp(), user.getId());
+    System.out.println("Inserted new tweet with id " + tweet.getTweetId());
     h.close();
   }
 

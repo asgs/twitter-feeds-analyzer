@@ -1,10 +1,15 @@
 package org.asgs.twitterfeeds;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Properties;
 
+import javax.sql.DataSource;
 
+import org.asgs.twitterfeeds.common.clients.DatabaseClient;
 import org.asgs.twitterfeeds.common.clients.KafkaClient;
 import org.asgs.twitterfeeds.common.model.TwitterFeed;
 
@@ -13,11 +18,14 @@ public class FeedProcessor {
   public void processTweets() {
     KafkaClient<String, TwitterFeed> kafkaConsumer = new KafkaClient<>(getKafkaClusterPropsForIngestion());
     KafkaClient<String, TwitterFeed> kafkaPublisher = new KafkaClient<>(getKafkaClusterPropsForIngestion());
-    DatabaseClient databasePublisher = new DatabaseClient(); // Pass the dataSource;
-    kafkaConsumer.subscribe().stream().forEach(e -> {
-      System.out.println("Processed tweet with Id " + e.getTweetId());
-      kafkaPublisher.publish(e.getTweetId(), e);
-      databasePublisher.saveTweet(e);
+    DatabaseClient databasePublisher = new DatabaseClient(getDataSource());
+    kafkaConsumer.subscribe().parallelStream().forEach(e -> {
+      // There are tweets which are deleted by the user meaning id is different, which we are conveniently ignoring for now.
+      if (e.getTweetId() != null) {
+        System.out.println("Received tweet with Id " + e.getTweetId());
+        kafkaPublisher.publish(e.getTweetId(), e);
+        databasePublisher.saveTweet(e);
+      }
     });
   }
 
@@ -42,5 +50,10 @@ public class FeedProcessor {
     properties.put("consumer-topic", "tweet-stream");
     properties.put("producer-topic", "processed-tweets");
     return properties;
+  }
+
+  private DataSource getDataSource() {
+    HikariConfig config = new HikariConfig("/hikari.properties"); // Available at the root of classpath.
+    return new HikariDataSource(config);
   }
 }
