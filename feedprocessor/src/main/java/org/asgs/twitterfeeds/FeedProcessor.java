@@ -11,12 +11,13 @@ import org.asgs.twitterfeeds.common.model.TwitterFeed;
 public class FeedProcessor {
 
   public void processTweets() {
-    KafkaClient<String, TwitterFeed> consumer = new KafkaClient<>(getKafkaClusterPropsForIngestion());
-
-    KafkaClient<String, TwitterFeed> publisher = new KafkaClient<>(getKafkaClusterPropsForIngestion());
-    consumer.subscribe().stream().forEach(e -> {
+    KafkaClient<String, TwitterFeed> kafkaConsumer = new KafkaClient<>(getKafkaClusterPropsForIngestion());
+    KafkaClient<String, TwitterFeed> kafkaPublisher = new KafkaClient<>(getKafkaClusterPropsForIngestion());
+    DatabaseClient databasePublisher = new DatabaseClient(); // Pass the dataSource;
+    kafkaConsumer.subscribe().stream().forEach(e -> {
       System.out.println("Processed tweet with Id " + e.getTweetId());
-      publisher.publish(e.getTweetId(), e);
+      kafkaPublisher.publish(e.getTweetId(), e);
+      databasePublisher.saveTweet(e);
     });
   }
 

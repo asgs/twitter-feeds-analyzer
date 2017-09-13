@@ -24,13 +24,12 @@ public class DatabaseClient {
 
   public void saveTweet(TwitterFeed tweet) {
     Handle h = dbi.open();
-    // create insert query and execute it.
     TwitterUser user = tweet.getUser();
-    // Check if user exists in DB, else insert a user first.
+    // Check if user exists in DB, else insert the user first.
     String id = h.createQuery("select id from tweeter where id = :id")
-    .bind("id", user.getId())
-    .map(StringMapper.FIRST)
-    .first();
+                 .bind("id", user.getId())
+                 .map(StringMapper.FIRST)
+                 .first();
     if (id == null) { // User is not added to the DB yet.
       h.execute("insert into tweeter values (?, ?, ?, ?, ?)", user.getId(), user.getLocation(), user.getFollowersCount(), user.getFriendsCount(), user.getStatusesCount());
     }
