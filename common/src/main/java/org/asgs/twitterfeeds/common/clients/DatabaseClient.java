@@ -61,12 +61,12 @@ public class DatabaseClient {
       query.bind(bindingEntry.getKey(), bindingEntry.getValue());
     }
 
-    query.map(typeMapper.get(klass));
+    Query<T> typedQuery = query.map(typeMapper.get(klass));
 
     if (type == ResultType.ALL) {
-      return query.list();
+      return typedQuery.list();
     } else {
-      return Arrays.asList((T)query.first());
+      return Arrays.asList((T)typedQuery.first());
     }
   }
 
