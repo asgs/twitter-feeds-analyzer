@@ -1,10 +1,14 @@
 package org.asgs.twitterfeeds.common.clients;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
+import java.util.stream.IntStream;
 import javax.sql.DataSource;
 
 import org.asgs.twitterfeeds.common.model.TwitterFeed;
@@ -17,8 +21,10 @@ import org.skife.jdbi.v2.tweak.ResultSetMapper;
 import org.skife.jdbi.v2.util.IntegerMapper;
 import org.skife.jdbi.v2.util.LongMapper;
 import org.skife.jdbi.v2.util.StringMapper;
+
 /**
- * A Database client to query and manipulate the Tweets on the Database.
+ * A Database client to query and manipulate the Tweets on the Database using
+ * a simple straight-forward Query Mapper JDBI.
  */
 public class DatabaseClient {
 
@@ -36,43 +42,53 @@ public class DatabaseClient {
   }
 
   public void saveTweet(TwitterFeed tweet) {
-    System.out.println("Request to Insert new tweet with id " + tweet.getTweetId());
-    Handle h = dbi.open();
     TwitterUser user = tweet.getUser();
-    // Check if user exists in DB, else insert the user first.
-    String id = h.createQuery("select id from tweeter where id = :id")
-                 .bind("id", user.getId())
-                 .map(StringMapper.FIRST)
-                 .first();
-    if (id == null) { // User is not added to the DB yet.
-      h.execute("insert into tweeter values (?, ?, ?, ?, ?)", user.getId(), user.getLocation(), user.getFollowersCount(), user.getFriendsCount(), user.getStatusesCount());
+    // Check if user exists in DB.
+    String id = query("select id from tweeter where id = :id", ImmutableMap.of("id", user.getId()), String.class, ResultType.FIRST).get(0);
+
+    if (id == null) { // User is not added to the DB yet, so insert first.
+      insertRow("insert into tweeter", user.getId(), user.getLocation(), user.getFollowersCount(), user.getFriendsCount(), user.getStatusesCount());
       System.out.println("Inserted new user with id " + user.getId());
     }
     // Now insert the tweet coupling it to the said user.
-    h.execute("insert into tweet values (?, ?, ?, ?, ?)", tweet.getTweetId(), tweet.getTweet(), tweet.getTweetLanguage(), tweet.getTimestamp(), user.getId());
+    insertRow("insert into tweet", tweet.getTweetId(), tweet.getTweet(), tweet.getTweetLanguage(), tweet.getTimestamp(), user.getId());
     System.out.println("Inserted new tweet with id " + tweet.getTweetId());
+  }
+
+  public void insertRow(String sql, Object... bindingParameters) {
+    Handle h = dbi.open();
+    // The sql string mustn't contain the values () part. It will be auto-constructed.
+    h.execute(generateValuesClause(sql, bindingParameters.length), bindingParameters);
     h.close();
   }
 
   public <T> List<T> query(String sql, Map<String, Object> bindingMap, Class<T> klass, ResultType type) {
     Handle h = dbi.open();
     Query query = h.createQuery(sql);
+
     for (Map.Entry<String, Object> bindingEntry : bindingMap.entrySet()) {
-      query.bind(bindingEntry.getKey(), bindingEntry.getValue());
+      query = (Query) query.bind(bindingEntry.getKey(), bindingEntry.getValue());
     }
 
     Query<T> typedQuery = query.map(typeMapper.get(klass));
+    List<T> results;
 
     if (type == ResultType.ALL) {
-      return typedQuery.list();
+      results = typedQuery.list();
     } else {
-      return Arrays.asList((T)typedQuery.first());
+      results = Arrays.asList((T)typedQuery.first());
     }
+
+    h.close();
+    return results;
   }
 
-  public static enum ResultType {
-    ALL, // Return all results.
-    FIRST // Return the first result.
+  private String generateValuesClause(String sql, int numberOfParameters) {
+    StringBuilder builder = new StringBuilder(sql);
+    builder.append(" values ");
+    StringJoiner joiner = new StringJoiner(",", "(", ")");
+    IntStream.range(0, numberOfParameters).forEach(x -> joiner.add("?"));
+    builder.append(joiner.toString());
+    return builder.toString();
   }
-
 }
