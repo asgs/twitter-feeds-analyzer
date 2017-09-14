@@ -25,53 +25,31 @@ This is only to understand some techniques related to data processing, especiall
 
 ## Setup
 
-This project currently requires [Apache Kafka](http://kafka.apache.org/quickstart)(for messaging communications), [Apache Zookeeper](https://zookeeper.apache.org)(for distributed co-ordination of services like Kafka). The host, port number, Kafka topic details are *currently* hardcoded in the respective project modules as a Java `Properties` instance. So if you would like to deviate from the defaults, feel free to do so.
+This project currently requires [Apache Kafka](http://kafka.apache.org/quickstart) (for messaging communications), [Apache Zookeeper](https://zookeeper.apache.org) (for distributed co-ordination of services like Kafka). The host, port number, Kafka topic details are *currently* hardcoded in the respective project modules as a Java `Properties` instance. So if you would like to deviate from the defaults, feel free to do so.
+
+Also, a Postgres DB instance is used to persist the processed data that would be queried by the REST API while retrieving the stats. Its details are configured in the `hikari.properties` file inside the `feedprocessor` and `analyzer-webapp` project modules.
 
 ## Build and Run
 
-Make sure the Zookeeper and Kafka services are running and their details are configured.
+Make sure the Zookeeper and Kafka services are running and their details are configured accordingly.
 
-<ul>
-<li>
+1. To run the Feed Reader, run the `feedreader.sh` script passing the following four arguments one after the other in that particular order.
 
-To run the Feed Reader, run the `feedreader.sh` script passing the following arguments in that particular order.
+* `<consumer_key>`
+* `<consumer_secret>`
+* `<access_token>`
+* `<access_token_secret>`
 
-<ul>
-<li>
-`<consumer_key>`
-</li>
-<li>
-`<consumer_secret>`
-</li>
-<li>
-`<access_token>`
-</li>
-<li>
-`<access_token_secret>`
-</li>
-</ul>
+2. To run the Feed Processor, run the script `feedprocessor.sh`.
 
-</li>
-
-<li>
-
-To run the Feed Processor, run the script `feedprocessor.sh`
-
-</li>
-
-<li>
-
-Finally, to run the REST server, run the script `rest-server.sh` and hit the endpoint `http://localhost:8080/tw-stats` to see some basic common Twitter stats.
-
-</li>
-</ul>
+3. Finally, to run the REST server, run the script `rest-server.sh` and hit the endpoint `http://localhost:8080/tw-stats` to see some basic common Twitter stats.
 
 <b>Status</b>
 -------------
 
 The basic goal of the project which is, to ingest the twitter feeds, process them and generate some random statistics out of it, is achieved. However, there are a few important things I'd like to cover.
 
-1. It's NOT really a stream processor at the moment. The `feedprocessor` module just waits for each and every message that is available in a time window of 5 seconds. So, unless the stream is fully consumed or stops for some reason, the processing doesn&apos;t begin. So goal is to use the Kafka Streams library to process it in "real-time". Another option is to a Reactive programming library to just "react" to the events.
+1. It's NOT really a stream processor at the moment. The `feedprocessor` module just waits for each and every message that is available in a time window of 5 seconds. So, unless the stream is fully consumed or stops for some reason, the processing doesn't begin. So goal is to use the Kafka Streams library to process it in "real-time". Another option is to a Reactive programming library to just "react" to the events as and when they occur.
 
 2. The original stream of twitter feeds are pushed on to a Kafka topic, so the moment it's consumed by a subscriber it's gone. To be able to process the streams using the original "raw" data at a later point of time, it needs to be persisted in a datastore (preferrably MongoDB as it does support JSON out-of-the-box).
 
