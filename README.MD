@@ -18,7 +18,7 @@ This is only to understand some techniques related to data processing, especiall
 
 <li>
 
-<i>Feed Querier</i> - This will most likely be a REST API to serve queries fired from a UI; It will in turn query the database and/or the topic (which contains the processed feeds data) and return results
+<i>Analyzer Webapp</i> - This is mostly a REST app to serve queries fired from a UI; It will in turn query the database and/or the topic (which contains the processed feeds data) and return JSON data.
 
 </li>
 </ul>
@@ -34,18 +34,48 @@ Make sure the Zookeeper and Kafka services are running and their details are con
 <ul>
 <li>
 
-To run the Feed Reader, run the command `mvn -e clean package && java -jar target/feedreader-1.0-SNAPSHOT.jar <consumer_key> <consumer_secret> <access_token> <access_token_secret`
+To run the Feed Reader, run the `feedreader.sh` script passing the following arguments in that particular order.
+
+<ul>
+<li>
+`<consumer_key>`
+</li>
+<li>
+`<consumer_secret>`
+</li>
+<li>
+`<access_token>`
+</li>
+<li>
+`<access_token_secret>`
+</li>
+</ul>
 
 </li>
 
 <li>
 
-To run the Feed Processor, run the command `mvn -e clean package && java -jar target/feedprocessor-1.0-SNAPSHOT.jar`
+To run the Feed Processor, run the script `feedprocessor.sh`
+
+</li>
+
+<li>
+
+Finally, to run the REST server, run the script `rest-server.sh` and hit the endpoint `http://localhost:8080/tw-stats` to see some basic common Twitter stats.
 
 </li>
 </ul>
 
 <b>Status</b>
+-------------
 
-This is a work-in-progress. The components mentioned above may not be retained (or more components could be added as well). 
+The basic goal of the project which is, to ingest the twitter feeds, process them and generate some random statistics out of it, is achieved. However, there are a few important things I'd like to cover.
+
+1. It's NOT really a stream processor at the moment. The `feedprocessor` module just waits for each and every message that is available in a time window of 5 seconds. So, unless the stream is fully consumed or stops for some reason, the processing doesn&apos;t begin. So goal is to use the Kafka Streams library to process it in "real-time". Another option is to a Reactive programming library to just "react" to the events.
+
+2. The original stream of twitter feeds are pushed on to a Kafka topic, so the moment it's consumed by a subscriber it's gone. To be able to process the streams using the original "raw" data at a later point of time, it needs to be persisted in a datastore (preferrably MongoDB as it does support JSON out-of-the-box).
+
+3. The stats that are generated are not specific to a time period. So showing stats like who are the top Tweeters for the last week or which language tweeter preferred to tweet the most in 2016 and 2017, etc., are better than showing the same stats without pinning it down to some timeline.
+
+4. Build a simple frontend to visualize the stats. NOT a priority at the moment, though.
 
