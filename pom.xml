@@ -2,17 +2,36 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.asgs.twitterfeeds</groupId>
-  <artifactId>analyzer</artifactId>
+  <artifactId>container</artifactId>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>A Simple (and stupid) Analyzer of Twitter Live Feeds</name>
   <url>http://maven.apache.org</url>
-
+   
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+<!--build>
+<plugins>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.3</version>
+        <configuration>
+            <source>${maven.compiler.source}</source>
+            <target>${maven.compiler.target}</target>
+        </configuration>
+    </plugin>
+</plugins>
+</build-->
   <modules>
     <module>common</module>
     <module>feedreader</module>
     <module>feedprocessor</module>
     <module>analyzer-webapp</module>
+    <module>stream-processor</module>
   </modules>
 
 </project>
