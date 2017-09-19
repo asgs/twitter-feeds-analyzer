@@ -29,6 +29,8 @@ This project currently requires [Apache Kafka](http://kafka.apache.org/quickstar
 
 Also, a Postgres DB instance is used to persist the processed data that would be queried by the REST API while retrieving the stats. Its details are configured in the `hikari.properties` file inside the `feedprocessor` and `analyzer-webapp` project modules.
 
+It's also assumed you have a Twitter developer account with at least one app registered on their portal. Check out [OAuth Overview](https://dev.twitter.com/oauth/overview/introduction) documentation on usage of Twitter APIs.
+
 ## Build and Run
 
 Make sure the Zookeeper and Kafka services are running and their details are configured accordingly.
@@ -49,11 +51,11 @@ Make sure the Zookeeper and Kafka services are running and their details are con
 
 The basic goal of the project which is, to ingest the twitter feeds, process them and generate some random statistics out of it, is achieved. However, there are a few important things I'd like to cover.
 
-1. It's NOT really a stream processor at the moment. The `feedprocessor` module just waits for each and every message that is available in a time window of 5 seconds. So, unless the stream is fully consumed or stops for some reason, the processing doesn't begin. So goal is to use the Kafka Streams library to process it in "real-time". Another option is to a Reactive programming library to just "react" to the events as and when they occur.
+1. It's NOT really a stream processor at the moment. The `feedprocessor` module just waits for each and every message that is available in a time window of 5 seconds. So, unless the stream is fully consumed or stops for some reason, the processing doesn't begin. So goal is to use the Kafka Streams library to process it in "real-time". Another option is to use a Reactive programming library to just "react" to the events as and when they occur.
 
-2. The original stream of twitter feeds are pushed on to a Kafka topic, so the moment it's consumed by a subscriber it's gone. To be able to process the streams using the original "raw" data at a later point of time, it needs to be persisted in a datastore (preferrably MongoDB as it does support JSON out-of-the-box).
+2. The original stream of twitter feeds are pushed on to a Kafka topic, so the moment it's consumed by a subscriber it's gone. To be able to process the original "raw" data at a later point of time, it needs to be persisted in a datastore (preferrably MongoDB as it does support JSON out-of-the-box).
 
-3. The stats that are generated are not specific to a time period. So showing stats like who are the top Tweeters for the last week or which language tweeter preferred to tweet the most in 2016 and 2017, etc., are better than showing the same stats without pinning it down to some timeline.
+3. The stats that are generated are not specific to a time period. So showing stats like who the top Tweeters for the last week are or which language tweeters preferred to tweet the most in 2016 and 2017, etc., are better than showing the same stats without pinning it down to some timeline.
 
-4. Build a simple frontend to visualize the stats. NOT a priority at the moment, though.
+4. Build a simple frontend to visualize the stats and perhaps stream the stats to reflect real-time data. NOT a priority at the moment, though.
 
