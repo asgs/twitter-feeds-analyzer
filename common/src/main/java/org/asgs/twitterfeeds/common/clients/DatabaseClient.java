@@ -68,8 +68,11 @@ public class DatabaseClient {
   public void insertRow(String sql, Object... bindingParameters) {
     Handle h = dbi.open();
     // The sql string mustn't contain the values () part. It will be auto-constructed.
-    h.execute(generateValuesClause(sql, bindingParameters.length), bindingParameters);
-    h.close();
+    try {
+      h.execute(generateValuesClause(sql, bindingParameters.length), bindingParameters);
+    } finally {
+      h.close();
+    }
   }
 
   public <T> List<T> query(
@@ -84,13 +87,16 @@ public class DatabaseClient {
     Query<T> typedQuery = query.map(typeMapper.get(klass));
     List<T> results;
 
-    if (type == ResultType.ALL) {
-      results = typedQuery.list();
-    } else {
-      results = Arrays.asList((T) typedQuery.first());
+    try {
+      if (type == ResultType.ALL) {
+        results = typedQuery.list();
+      } else {
+        results = Arrays.asList((T) typedQuery.first());
+      }
+    } finally {
+      h.close();
     }
 
-    h.close();
     return results;
   }
 
