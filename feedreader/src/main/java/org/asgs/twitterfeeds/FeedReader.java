@@ -1,7 +1,6 @@
 package org.asgs.twitterfeeds;
 
 /** Code adapted from https://github.com/twitter/hbc/tree/master/hbc-example. */
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.twitter.hbc.ClientBuilder;
 import com.twitter.hbc.core.Constants;

@@ -10,7 +10,6 @@ import org.asgs.twitterfeeds.common.clients.DatabaseClient;
 import org.asgs.twitterfeeds.common.model.TwitterFeed;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
