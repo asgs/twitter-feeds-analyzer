@@ -20,7 +20,7 @@ public class FeedProcessor {
     KafkaClient<String, TwitterFeed> kafkaPublisher = new KafkaClient<>(getKafkaClusterPropsForIngestion());
     DatabaseClient databasePublisher = new DatabaseClient(getDataSource());
     kafkaConsumer.subscribe().parallelStream().forEach(e -> {
-      // There are tweets which are deleted by the user meaning id is different, which we are conveniently ignoring for now.
+      // There are tweets which are deleted by the user meaning id is missing, which we are conveniently ignoring for now.
       if (e.getTweetId() != null) {
         System.out.println("Received tweet with Id " + e.getTweetId());
         kafkaPublisher.publish(e.getTweetId(), e);

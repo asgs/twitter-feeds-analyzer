@@ -1,15 +1,23 @@
 package org.asgs.twitterfeeds;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
+import javax.sql.DataSource;
 
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStreamBuilder;
 
+import org.asgs.twitterfeeds.common.clients.DatabaseClient;
+import org.asgs.twitterfeeds.common.model.TwitterFeed;
+
 /**
- * Hello world!
+ * Processes the stream of tweets as they come in and publishes the processed
+ * data to interested endpoints. E.g., another Kafka topic and a Database for now.
  *
  */
 public class StreamProcessor
@@ -24,8 +32,9 @@ public class StreamProcessor
       properties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
       properties.put("value.deserializer", "org.asgs.twitterfeeds.processor.serdes.TwitterFeedDeserializer");
 
+      DatabaseClient databasePublisher = new DatabaseClient(getDataSource());
       KStreamBuilder streamBuilder = new KStreamBuilder();
-      streamBuilder.stream("tweet-stream").to("processed-tweets");
+      streamBuilder.<String, TwitterFeed>stream("tweet-stream").through("processed-tweets").foreach((k, v) -> databasePublisher.saveTweet(v));
 
       KafkaStreams stream = new KafkaStreams(streamBuilder, properties);
       CountDownLatch latch = new CountDownLatch(1);
@@ -40,5 +49,10 @@ public class StreamProcessor
         System.exit(1);
       }
       System.exit(0);
+    }
+
+    private static DataSource getDataSource() {
+      HikariConfig config = new HikariConfig("/hikari.properties"); // Available at the root of classpath.
+      return new HikariDataSource(config);
     }
 }
