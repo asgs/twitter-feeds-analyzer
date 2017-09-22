@@ -1,26 +1,26 @@
 package org.asgs.twitterfeeds.common.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TwitterUser {
 
-  @JsonProperty(value="id_str")
+  @JsonProperty(value = "id_str")
   private String id;
 
   private String location;
 
-  @JsonProperty(value="followers_count")
+  @JsonProperty(value = "followers_count")
   private int followersCount;
 
-  @JsonProperty(value="friends_count")
+  @JsonProperty(value = "friends_count")
   private int friendsCount;
 
-  @JsonProperty(value="statuses_count")
+  @JsonProperty(value = "statuses_count")
   private int statusesCount;
 
-  @JsonProperty(value="lang")
+  @JsonProperty(value = "lang")
   private String language;
 
   public String getId() {
@@ -49,7 +49,16 @@ public class TwitterUser {
 
   @Override
   public String toString() {
-    return "[location=" + location + ";followers_count="+ followersCount + ";friends_count=" + friendsCount + "statuses_count=" + statusesCount + "lang=" + language + "]";
+    return "[location="
+        + location
+        + ";followers_count="
+        + followersCount
+        + ";friends_count="
+        + friendsCount
+        + "statuses_count="
+        + statusesCount
+        + "lang="
+        + language
+        + "]";
   }
-
 }

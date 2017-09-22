@@ -1,19 +1,8 @@
 package org.asgs.twitterfeeds.common.clients;
 
 import com.google.common.collect.ImmutableMap;
-
-import java.sql.Connection;
-import java.util.Arrays;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringJoiner;
-import java.util.stream.IntStream;
-import javax.sql.DataSource;
-
 import org.asgs.twitterfeeds.common.model.TwitterFeed;
 import org.asgs.twitterfeeds.common.model.TwitterUser;
-
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.Query;
@@ -22,17 +11,20 @@ import org.skife.jdbi.v2.util.IntegerMapper;
 import org.skife.jdbi.v2.util.LongMapper;
 import org.skife.jdbi.v2.util.StringMapper;
 
+import javax.sql.DataSource;
+import java.util.*;
+import java.util.stream.IntStream;
+
 /**
- * A Database client to query and manipulate the Tweets on the Database using
- * a simple straight-forward Query Mapper JDBI.
+ * A Database client to query and manipulate the Tweets on the Database using a simple
+ * straight-forward Query Mapper JDBI.
  */
 public class DatabaseClient {
 
-  private DataSource dataSource;
   private DBI dbi;
   private Map<Class, ResultSetMapper<?>> typeMapper;
+
   public DatabaseClient(DataSource dataSource) {
-    this.dataSource = dataSource;
     System.out.println("Initializing JDBI with dataSource " + dataSource);
     this.dbi = new DBI(dataSource);
     typeMapper = new HashMap<>();
@@ -44,14 +36,32 @@ public class DatabaseClient {
   public void saveTweet(TwitterFeed tweet) {
     TwitterUser user = tweet.getUser();
     // Check if user exists in DB.
-    String id = query("select id from tweeter where id = :id", ImmutableMap.of("id", user.getId()), String.class, ResultType.FIRST).get(0);
+    String id =
+        query(
+                "select id from tweeter where id = :id",
+                ImmutableMap.of("id", user.getId()),
+                String.class,
+                ResultType.FIRST)
+            .get(0);
 
     if (id == null) { // User is not added to the DB yet, so insert first.
-      insertRow("insert into tweeter", user.getId(), user.getLocation(), user.getFollowersCount(), user.getFriendsCount(), user.getStatusesCount());
+      insertRow(
+          "insert into tweeter",
+          user.getId(),
+          user.getLocation(),
+          user.getFollowersCount(),
+          user.getFriendsCount(),
+          user.getStatusesCount());
       System.out.println("Inserted new user with id " + user.getId());
     }
     // Now insert the tweet coupling it to the said user.
-    insertRow("insert into tweet", tweet.getTweetId(), tweet.getTweet(), tweet.getTweetLanguage(), tweet.getTimestamp(), user.getId());
+    insertRow(
+        "insert into tweet",
+        tweet.getTweetId(),
+        tweet.getTweet(),
+        tweet.getTweetLanguage(),
+        tweet.getTimestamp(),
+        user.getId());
     System.out.println("Inserted new tweet with id " + tweet.getTweetId());
   }
 
@@ -62,7 +72,8 @@ public class DatabaseClient {
     h.close();
   }
 
-  public <T> List<T> query(String sql, Map<String, Object> bindingMap, Class<T> klass, ResultType type) {
+  public <T> List<T> query(
+      String sql, Map<String, Object> bindingMap, Class<T> klass, ResultType type) {
     Handle h = dbi.open();
     Query query = h.createQuery(sql);
 
@@ -76,7 +87,7 @@ public class DatabaseClient {
     if (type == ResultType.ALL) {
       results = typedQuery.list();
     } else {
-      results = Arrays.asList((T)typedQuery.first());
+      results = Arrays.asList((T) typedQuery.first());
     }
 
     h.close();

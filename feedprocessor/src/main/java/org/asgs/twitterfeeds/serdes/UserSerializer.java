@@ -1,13 +1,11 @@
 package org.asgs.twitterfeeds.processor.serdes;
 
-import java.util.Map;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.serialization.Serializer;
-
 import org.asgs.twitterfeeds.common.model.TwitterUser;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.Map;
 
 public class UserSerializer implements Serializer<TwitterUser> {
 
@@ -23,12 +21,8 @@ public class UserSerializer implements Serializer<TwitterUser> {
   }
 
   @Override
-  public void close() {
-  }
+  public void close() {}
 
   @Override
-  public void configure(Map<String, ?> map, boolean key) {
-
-  }
-
+  public void configure(Map<String, ?> map, boolean key) {}
 }

@@ -1,10 +1,7 @@
 package org.asgs.twitterfeeds;
 
 import io.dropwizard.Configuration;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.validator.constraints.*;
-import javax.validation.constraints.*;
 
 public class AnalyzerWebappConfiguration extends Configuration {
-    // TODO: implement service configuration
+  // TODO: implement service configuration
 }

@@ -4,26 +4,21 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import java.io.IOException;
-
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Stream;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * A Kafka client which will manage publish, subscribe mechanisms relating to
- * Tweets. It's intended to be instantiated on a per-topic basis. The topic
- * information along with all other Kafka cluster-specific information will
- * need to be made available within the properties instance provided during
- * the construction of the client.
+ * A Kafka client which will manage publish, subscribe mechanisms relating to Tweets. It's intended
+ * to be instantiated on a per-topic basis. The topic information along with all other Kafka
+ * cluster-specific information will need to be made available within the properties instance
+ * provided during the construction of the client.
  */
 public class KafkaClient<K, V> {
 
