@@ -86,7 +86,7 @@ public class RdbmsClient {
       query = (Query) query.bind(bindingEntry.getKey(), bindingEntry.getValue());
     }
 
-    Query<T> typedQuery = query.map(typeMapper.get(klass));
+    Query<T> typedQuery = query.<T>map(typeMapper.get(klass));
     List<T> results;
 
     try {
