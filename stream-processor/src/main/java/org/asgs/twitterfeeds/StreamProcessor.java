@@ -37,7 +37,7 @@ public class StreamProcessor {
               System.out.println("Pushing tweet to DB; " + v);
               try {
                 databasePublisher.saveTweet(v);
-              } catch (Exception e) {
+              } catch (Exception e) { // Need to be caught, so that other tweets can flow in.
                 e.printStackTrace();
               }
             });
