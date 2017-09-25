@@ -2,7 +2,7 @@ package org.asgs.twitterfeeds;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.asgs.twitterfeeds.common.clients.DatabaseClient;
+import org.asgs.twitterfeeds.common.clients.RdbmsClient;
 import org.asgs.twitterfeeds.common.clients.KafkaClient;
 import org.asgs.twitterfeeds.common.model.TwitterFeed;
 
@@ -21,7 +21,7 @@ public class FeedProcessor {
         new KafkaClient<>(getKafkaClusterPropsForIngestion());
     KafkaClient<String, TwitterFeed> kafkaPublisher =
         new KafkaClient<>(getKafkaClusterPropsForIngestion());
-    DatabaseClient databasePublisher = new DatabaseClient(getDataSource());
+    RdbmsClient databasePublisher = new RdbmsClient(getDataSource());
     kafkaConsumer
         .subscribe()
         .parallelStream()

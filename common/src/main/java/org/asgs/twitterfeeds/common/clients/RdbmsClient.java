@@ -19,12 +19,12 @@ import java.util.stream.IntStream;
  * A Database client to query and manipulate the Tweets on the Database using a simple
  * straight-forward Query Mapper JDBI.
  */
-public class DatabaseClient {
+public class RdbmsClient {
 
   private DBI dbi;
   private Map<Class, ResultSetMapper<?>> typeMapper;
 
-  public DatabaseClient(DataSource dataSource) {
+  public RdbmsClient(DataSource dataSource) {
     System.out.println("Initializing JDBI with dataSource " + dataSource);
     this.dbi = new DBI(dataSource);
     typeMapper = new HashMap<>();
@@ -53,6 +53,8 @@ public class DatabaseClient {
           user.getFriendsCount(),
           user.getStatusesCount());
       System.out.println("Inserted new user with id " + user.getId());
+    } else {
+      System.out.println("Linking tweet with existing user id " + user.getId());
     }
     // Now insert the tweet coupling it to the said user.
     insertRow(

@@ -23,7 +23,7 @@ public class FeedReader {
   public static void main(String[] args) throws InterruptedException, IOException {
     if (args.length != 4) {
       System.err.println(
-          "Incorrect Usage: Pass the consumerKey, consumerSecret, token, secret as arguments.");
+          "Incorrect Usage: Pass the Consumer Key, Consumer Secret, Access Token, and Access Token Secret as arguments.");
       return;
     }
 
@@ -62,14 +62,14 @@ public class FeedReader {
 
     for (int msgRead = 0; msgRead < 1000; msgRead++) {
       if (client.isDone()) {
-        System.out.println(
+        System.err.println(
             "Client connection closed unexpectedly: " + client.getExitEvent().getMessage());
         break;
       }
 
       String msg = queue.poll(5, TimeUnit.SECONDS);
       if (msg == null) {
-        System.out.println("Did not receive a message in 5 seconds");
+        System.err.println("Did not receive a message in 5 seconds");
       } else {
         System.out.println("Twitter feed received - " + msg);
         Map<?, ?> tree = mapper.readValue(msg, Map.class);
@@ -79,9 +79,8 @@ public class FeedReader {
 
     client.stop();
 
-    // Print some stats
-    System.out.printf("The client read %d messages!\n", client.getStatsTracker().getNumMessages());
-    // Timezone, Tweet Language, followers_count
+    System.out.println(
+        "Successfully read %d messages!" + client.getStatsTracker().getNumMessages());
   }
 
   private Properties getKafkaClusterProps() {

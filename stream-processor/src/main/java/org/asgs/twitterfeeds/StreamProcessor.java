@@ -6,7 +6,7 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStreamBuilder;
-import org.asgs.twitterfeeds.common.clients.DatabaseClient;
+import org.asgs.twitterfeeds.common.clients.RdbmsClient;
 import org.asgs.twitterfeeds.common.model.TwitterFeed;
 
 import javax.sql.DataSource;
@@ -26,7 +26,7 @@ public class StreamProcessor {
     properties.put(
         StreamsConfig.VALUE_SERDE_CLASS_CONFIG, "org.asgs.twitterfeeds.serdes.FeedSerde");
 
-    DatabaseClient databasePublisher = new DatabaseClient(getDataSource());
+    RdbmsClient databasePublisher = new RdbmsClient(getDataSource());
     KStreamBuilder streamBuilder = new KStreamBuilder();
     streamBuilder
         .<String, TwitterFeed>stream("tweet-stream")
