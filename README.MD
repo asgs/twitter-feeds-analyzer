@@ -6,13 +6,21 @@ This is only to understand some techniques related to data processing, especiall
 <ul>
 <li>
 
-<i>Feed Reader</i> - This connects to the Twitter API and reads the feeds based on some criteria (like hashtags, people's names, etc., which don't really matter). Those feeds will be put on a Kafka topic. This serves as the "raw" data that will be further processed as necessary.
+<i>Feed Reader</i> - This connects to the Twitter API and reads the feeds based on some criteria (like hashtags, people's names, etc., which don't really matter). Those feeds will be put on a Kafka topic. (It also pushes the raw feeds into a Mongodb store for processing at a later time.) This serves as the "raw" data that will be further processed as necessary.
 
 </li>
 
 <li>
 
 <i>Feed Processor</i> - This will process the feeds from the Kafkat topic and transform into some concrete structure and push to another topic; This could be subscribed by various datastores for persistent storage.
+
+</li>
+
+<li>
+
+<li>
+
+<i>Stream Processor</i> - This will process the feeds as and when they are streamed in by the feedreader. This is just a stream-processor form of the feedprocessor above.
 
 </li>
 
@@ -44,7 +52,9 @@ Make sure the Zookeeper and Kafka services are running and their details are con
 
 2. To run the Feed Processor, run the script `feedprocessor.sh`.
 
-3. Finally, to run the REST server, run the script `rest-server.sh` and hit the endpoint `http://localhost:8080/tw-stats` to see some basic common Twitter stats.
+3. Feed Processor is now being **Superseded** by the Stream Processor which does a better job at real-time stream processing. It can be run by invoking the script `stream-processor.sh`.
+
+4. Finally, to run the REST server, run the script `rest-server.sh` and hit the endpoint `http://localhost:8080/tw-stats` to see some basic common Twitter stats.
 
 <b>Status</b>
 -------------
@@ -53,7 +63,7 @@ The basic goal of the project which is, to ingest the twitter feeds, process the
 
 1. <del>It's NOT really a stream processor at the moment. The `feedprocessor` module just waits for each and every message that is available in a time window of 5 seconds. So, unless the stream is fully consumed or stops for some reason, the processing doesn't begin. So goal is to use the Kafka Streams library to process it in "real-time".</del> **StreamProcessor** does JUST that. Another option to explore is to use a Reactive programming library to just "react" to the events as and when they occur.
 
-2. The original stream of twitter feeds are pushed on to a Kafka topic, so the moment it's consumed by a subscriber it's gone. To be able to process the original "raw" data at a later point of time, it needs to be persisted in a datastore (preferrably MongoDB as it does support JSON out-of-the-box).
+2. <del>The original stream of twitter feeds are pushed on to a Kafka topic, so the moment it's consumed by a subscriber it's gone. To be able to process the original "raw" data at a later point of time, it needs to be persisted in a datastore (preferrably MongoDB as it does support JSON out-of-the-box).</del> **FeedReader** now does JUST that.
 
 3. The stats that are generated are not specific to a time period. So showing stats like who the top Tweeters for the last week are or which language tweeters preferred to tweet the most in 2016 and 2017, etc., are better than showing the same stats without pinning it down to some timeline.
 
