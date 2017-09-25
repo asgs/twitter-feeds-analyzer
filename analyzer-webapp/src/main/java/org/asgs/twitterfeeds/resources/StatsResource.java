@@ -9,8 +9,11 @@ import org.asgs.twitterfeeds.model.CommonStats.CommonStatsBuilder;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.time.Instant;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,10 +33,10 @@ public class StatsResource {
   }
 
   @GET
-  public CommonStats getStats() {
+  public CommonStats getStats(@QueryParam("from") Long fromEpoch, @QueryParam("to") Long toEpoch) {
     CommonStatsBuilder builder = CommonStats.builder();
 
-    gatherTotalTweets(builder);
+    gatherTotalTweets(builder, fromEpoch, toEpoch);
 
     gatherTotalTweeters(builder);
 
@@ -41,16 +44,20 @@ public class StatsResource {
 
     gatherTopTenStatusCounts(builder);
 
-    gatherTopTenLanguages(builder);
+    gatherTopTenLanguages(builder, fromEpoch, toEpoch);
 
     gatherTopTenLocations(builder);
 
     return builder.build();
   }
 
-  private void gatherTotalTweets(CommonStatsBuilder builder) {
+  private void gatherTotalTweets(CommonStatsBuilder builder, Long fromEpoch, Long toEpoch) {
     List<Long> totalTweets =
-        rdbmsClient.query("select count(*) from tweet", EMPTY_MAP, Long.class, FIRST);
+        rdbmsClient.query(
+            "select count(*) from tweet where epoch_ms between :from and :to",
+            getFromToBindingMap(fromEpoch, toEpoch),
+            Long.class,
+            FIRST);
     builder.totalTweets(totalTweets.get(0));
   }
 
@@ -80,11 +87,11 @@ public class StatsResource {
     builder.topTenStatusCounts(topTenStatusCounts);
   }
 
-  private void gatherTopTenLanguages(CommonStatsBuilder builder) {
+  private void gatherTopTenLanguages(CommonStatsBuilder builder, Long fromEpoch, Long toEpoch) {
     List<String> topTenLanguages =
         rdbmsClient.query(
-            "select lang, count(*) as count from tweet group by lang order by count desc limit 10",
-            EMPTY_MAP,
+            "select lang, count(*) as count from tweet where epoch_ms between :from and :to group by lang order by count desc limit 10",
+            getFromToBindingMap(fromEpoch, toEpoch),
             String.class,
             ALL);
     builder.topTenLanguages(topTenLanguages);
@@ -98,5 +105,12 @@ public class StatsResource {
             String.class,
             ALL);
     builder.topTenLocations(topTenLocations);
+  }
+
+  private Map<String, Object> getFromToBindingMap(Long fromEpoch, Long toEpoch) {
+    Map<String, Object> map = new HashMap<>();
+    map.put("from", fromEpoch == null ? Instant.EPOCH.getEpochSecond() * 1000 : fromEpoch);
+    map.put("to", toEpoch == null ? Instant.now().getEpochSecond() * 1000 : toEpoch);
+    return map;
   }
 }
