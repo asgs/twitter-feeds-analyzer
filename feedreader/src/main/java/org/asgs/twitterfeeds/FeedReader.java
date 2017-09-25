@@ -49,7 +49,7 @@ public class FeedReader {
     Authentication auth = new OAuth1(consumerKey, consumerSecret, token, secret);
 
     // Create a new BasicClient. By default gzip is enabled.
-    BasicClient client =
+    BasicClient twitterStreamclient =
         new ClientBuilder()
             .name("sampleExampleClient")
             .hosts(Constants.STREAM_HOST)
@@ -59,7 +59,7 @@ public class FeedReader {
             .build();
 
     // Establish a connection
-    client.connect();
+    twitterStreamclient.connect();
 
     KafkaClient<String, String> kafkaClient = new KafkaClient<>(getKafkaClusterProps());
     MongoDbClient mongoDbClient = buildMongoClient();
@@ -67,9 +67,10 @@ public class FeedReader {
     ObjectMapper mapper = new ObjectMapper();
 
     for (int msgRead = 0; msgRead < 1000; msgRead++) {
-      if (client.isDone()) {
+      if (twitterStreamclient.isDone()) {
         System.err.println(
-            "Client connection closed unexpectedly: " + client.getExitEvent().getMessage());
+            "Client connection closed unexpectedly: "
+                + twitterStreamclient.getExitEvent().getMessage());
         break;
       }
 
@@ -80,13 +81,15 @@ public class FeedReader {
         System.out.println("Twitter feed received - " + msg);
         Map<?, ?> tree = mapper.readValue(msg, Map.class);
         kafkaClient.publish((String) tree.get("id_str"), msg);
+        mongoDbClient.insertJson(msg);
       }
     }
 
-    client.stop();
+    twitterStreamclient.stop();
+    mongoDbClient.close();
 
     System.out.println(
-        "Successfully read %d messages!" + client.getStatsTracker().getNumMessages());
+        "Successfully read %d messages!" + twitterStreamclient.getStatsTracker().getNumMessages());
   }
 
   private Properties getKafkaClusterProps() {

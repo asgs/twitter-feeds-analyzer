@@ -7,7 +7,6 @@ import com.mongodb.async.client.MongoClients;
 import com.mongodb.async.client.MongoCollection;
 import org.bson.Document;
 
-
 public class MongoDbClient {
 
   private MongoCollection collection;
