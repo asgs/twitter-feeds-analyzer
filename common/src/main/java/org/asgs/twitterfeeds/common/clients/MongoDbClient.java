@@ -12,12 +12,12 @@ public class MongoDbClient {
 
   private MongoCollection collection;
   private MongoClient client;
-  private SingleResultCallback<Void> callback =
+  private SingleResultCallback<Void> insertCallback =
       (result, throwable) -> {
         if (throwable != null) {
           System.err.println("Error inserting tweet. " + throwable.getMessage());
         } else {
-          System.out.println("Successfully inserted json document.");
+          System.out.println("Successfully inserted tweet as a json document.");
         }
       };
 
@@ -27,7 +27,7 @@ public class MongoDbClient {
   }
 
   public void insertJson(String json) {
-    collection.insertOne(Document.parse(json), callback);
+    collection.insertOne(Document.parse(json), insertCallback);
   }
 
   public void close() {

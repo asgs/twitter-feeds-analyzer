@@ -2,6 +2,9 @@ package org.asgs.twitterfeeds;
 
 /** Code adapted from https://github.com/twitter/hbc/tree/master/hbc-example. */
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.ServerAddress;
+import com.mongodb.async.client.MongoClientSettings;
+import com.mongodb.connection.ClusterSettings;
 import com.twitter.hbc.ClientBuilder;
 import com.twitter.hbc.core.Constants;
 import com.twitter.hbc.core.endpoint.StatusesSampleEndpoint;
@@ -10,8 +13,10 @@ import com.twitter.hbc.httpclient.BasicClient;
 import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
 import org.asgs.twitterfeeds.common.clients.KafkaClient;
+import org.asgs.twitterfeeds.common.clients.MongoDbClient;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
@@ -57,6 +62,7 @@ public class FeedReader {
     client.connect();
 
     KafkaClient<String, String> kafkaClient = new KafkaClient<>(getKafkaClusterProps());
+    MongoDbClient mongoDbClient = buildMongoClient();
 
     ObjectMapper mapper = new ObjectMapper();
 
@@ -98,5 +104,21 @@ public class FeedReader {
         "value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     properties.put("producer-topic", "tweet-stream");
     return properties;
+  }
+
+  private MongoDbClient buildMongoClient() throws IOException {
+    Properties mongoDbProperties = new Properties();
+    mongoDbProperties.load(this.getClass().getResourceAsStream("/mongodb.properties"));
+    ClusterSettings clusterSettings =
+        ClusterSettings.builder()
+            .hosts(
+                Arrays.asList(
+                    new ServerAddress(
+                        mongoDbProperties.getProperty("mongodb.host"),
+                        Integer.parseInt(mongoDbProperties.getProperty("mongodb.port")))))
+            .build();
+    MongoClientSettings mongoClientSettings =
+        MongoClientSettings.builder().clusterSettings(clusterSettings).build();
+    return new MongoDbClient(mongoClientSettings);
   }
 }
