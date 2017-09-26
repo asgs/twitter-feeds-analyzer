@@ -5,17 +5,20 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.asgs.twitterfeeds.common.clients.RdbmsClient;
 import org.asgs.twitterfeeds.model.CommonStats;
 import org.asgs.twitterfeeds.model.CommonStats.CommonStatsBuilder;
+import org.glassfish.jersey.server.ChunkedOutput;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.asgs.twitterfeeds.common.clients.ResultType.ALL;
 import static org.asgs.twitterfeeds.common.clients.ResultType.FIRST;
@@ -49,6 +52,39 @@ public class StatsResource {
     gatherTopTenLocations(builder);
 
     return builder.build();
+  }
+
+  @GET
+  @Path("/chunks")
+  public ChunkedOutput<CommonStats> getChunkedStats(
+      @QueryParam("from") Long fromEpoch, @QueryParam("to") Long toEpoch) {
+    final ChunkedOutput<CommonStats> chunkedOutput = new ChunkedOutput<>(CommonStats.class);
+    AtomicInteger counter = new AtomicInteger();
+    Runnable queryStats =
+        () -> {
+          while (true) {
+            System.out.println("Querying stats from DB.");
+            CommonStats commonStats = getStats(fromEpoch, toEpoch);
+            try {
+              System.out.println("Writing stats to chunkedOutput.");
+              chunkedOutput.write(commonStats);
+              if (counter.incrementAndGet() >= 4) {
+                chunkedOutput.close();
+                break;
+              }
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+
+            try {
+              Thread.sleep(5000);
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+            }
+          }
+        };
+    new Thread(queryStats).start();
+    return chunkedOutput;
   }
 
   private void gatherTotalTweets(CommonStatsBuilder builder, Long fromEpoch, Long toEpoch) {
