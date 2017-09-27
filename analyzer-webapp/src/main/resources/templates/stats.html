@@ -45,14 +45,31 @@
         {
             document.getElementById("totalTweets").textContent = obj.totalTweets;
             document.getElementById("totalTweeters").textContent = obj.totalTweeters;
-            document.getElementById("topTenFollowerCounts").textContent = obj.topTenFollowerCounts;
-            document.getElementById("topTenStatusCounts").textContent = obj.topTenStatusCounts;
-            document.getElementById("topTenLanguages").textContent = obj.topTenLanguages;
-            document.getElementById("topTenLocations").textContent = obj.topTenLocations;
+
+            createAndUpdateListItemsFor("topTenFollowerCounts", obj.topTenFollowerCounts);
+            createAndUpdateListItemsFor("topTenStatusCounts", obj.topTenStatusCounts);
+            createAndUpdateListItemsFor("topTenLanguages", obj.topTenLanguages);
+            createAndUpdateListItemsFor("topTenLocations", obj.topTenLocations);
+        }
+
+        function createAndUpdateListItemsFor(divElementId, listValues) {
+            var mainDiv = document.getElementById(divElementId);
+            mainDiv.innerHTML = "";
+            var ul = document.createElement("ul");
+            mainDiv.appendChild(ul);
+            for (var count of listValues)
+            {
+                var countLi = document.createElement('li');
+                countLi.textContent = count == null ? "unknown": count;
+                ul.appendChild(countLi);
+            }
         }
     </script>
 </head>
 <body onload="getEvents()">
+<div id="closeConnectionDiv">
+    <button id="closeConnection" style="text-align: center; color:red; font-style:bold">Stop Auto-Refresh</button>
+</div>
 <div id="totalTweetsDiv" style="border:solid 1px brown">
     <label for="totalTweets">Total Tweets</label>
     <div id="totalTweets"></div>
@@ -66,19 +83,16 @@
     <div id="topTenFollowerCounts"></div>
 </div>
 <div id="topTenStatusCountsDiv" style="border:solid 1px brown">
-    <label for="topTenStatusCounts">Total Tweets</label>
+    <label for="topTenStatusCounts">Top Ten Status Counts</label>
     <div id="topTenStatusCounts"></div>
 </div>
 <div id="topTenLanguagesDiv" style="border:solid 1px brown">
-    <label for="topTenLanguages">Total Tweets</label>
+    <label for="topTenLanguages">Top Ten Languages</label>
     <div id="topTenLanguages"></div>
 </div>
 <div id="topTenLocationsDiv" style="border:solid 1px brown">
-    <label for="topTenLocations">Total Tweets</label>
+    <label for="topTenLocations">Top Ten Locations</label>
     <div id="topTenLocations"></div>
-</div>
-<div id="closeConnectionDiv">
-    <button id="closeConnection" style="text-align: center; color:red">Close Connection</button>
 </div>
 </body>
 
