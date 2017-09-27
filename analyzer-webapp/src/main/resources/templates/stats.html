@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        function getEvents() {
+            var previousStats;
+
+            var eventSource = new EventSource("http://localhost:8080/tw-stats/stream", { withCredentials: false});
+
+            handleServerEvents(eventSource, previousStats);
+            handleEventError(eventSource);
+
+            var closeButton = document.getElementById("closeConnection");
+            attachCloseConnectionButtonHandler(closeButton);
+        }
+
+        function handleServerEvents(eventSource, previousStats) {
+            eventSource.onmessage = function (e) {
+                var currentStats = e.data;
+                console.log("message from server - " + currentStats);
+                var obj = JSON.parse(currentStats);
+                if (previousStats == null || currentStats != previousStats) {
+                    updateDom(obj);
+                    previousStats = currentStats;
+                } else {
+                    console.log("No new updates to show.");
+                }
+            }
+        }
+
+        function handleEventError(eventSource) {
+            eventSource.onerror = function (e) {
+                console.log("Error from server - " + e.type + " " + e.target + " " + e.detail + " " + e.view);
+            }
+        }
+
+        function attachCloseConnectionButtonHandler(closeConnection) {
+            closeConnection.onclick = function() {
+                console.log("Terminating connection to the server.");
+                eventSource.close();
+            }
+        }
+
+        function updateDom(obj)
+        {
+            document.getElementById("totalTweets").textContent = obj.totalTweets;
+            document.getElementById("totalTweeters").textContent = obj.totalTweeters;
+            document.getElementById("topTenFollowerCounts").textContent = obj.topTenFollowerCounts;
+            document.getElementById("topTenStatusCounts").textContent = obj.topTenStatusCounts;
+            document.getElementById("topTenLanguages").textContent = obj.topTenLanguages;
+            document.getElementById("topTenLocations").textContent = obj.topTenLocations;
+        }
+    </script>
+</head>
+<body onload="getEvents()">
+<div id="totalTweetsDiv" style="border:solid 1px brown">
+    <label for="totalTweets">Total Tweets</label>
+    <div id="totalTweets"></div>
+</div>
+<div id="totalTweetersDiv" style="border:solid 1px brown">
+    <label for="totalTweeters">Total Tweeters</label>
+    <div id="totalTweeters"></div>
+</div>
+<div id="topTenFollowerCountsDiv" style="border:solid 1px brown">
+    <label for="topTenFollowerCounts">Top Ten Follower Counts</label>
+    <div id="topTenFollowerCounts"></div>
+</div>
+<div id="topTenStatusCountsDiv" style="border:solid 1px brown">
+    <label for="topTenStatusCounts">Total Tweets</label>
+    <div id="topTenStatusCounts"></div>
+</div>
+<div id="topTenLanguagesDiv" style="border:solid 1px brown">
+    <label for="topTenLanguages">Total Tweets</label>
+    <div id="topTenLanguages"></div>
+</div>
+<div id="topTenLocationsDiv" style="border:solid 1px brown">
+    <label for="topTenLocations">Total Tweets</label>
+    <div id="topTenLocations"></div>
+</div>
+<div id="closeConnectionDiv">
+    <button id="closeConnection" style="text-align: center; color:red">Close Connection</button>
+</div>
+</body>
+
+</html>

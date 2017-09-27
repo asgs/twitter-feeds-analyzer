@@ -1,10 +1,14 @@
 package org.asgs.twitterfeeds.resources;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.asgs.twitterfeeds.common.clients.RdbmsClient;
 import org.asgs.twitterfeeds.model.CommonStats;
 import org.asgs.twitterfeeds.model.CommonStats.CommonStatsBuilder;
+import org.glassfish.jersey.media.sse.EventOutput;
+import org.glassfish.jersey.media.sse.OutboundEvent;
+import org.glassfish.jersey.media.sse.SseFeature;
 import org.glassfish.jersey.server.ChunkedOutput;
 
 import javax.ws.rs.GET;
@@ -85,6 +89,34 @@ public class StatsResource {
         };
     new Thread(queryStats).start();
     return chunkedOutput;
+  }
+
+  @GET
+  @Path("/stream")
+  @Produces(SseFeature.SERVER_SENT_EVENTS)
+  public EventOutput getStreamingStats(
+      @QueryParam("from") Long fromEpoch, @QueryParam("to") Long toEpoch) {
+    final EventOutput eventOutput = new EventOutput();
+    ObjectMapper mapper = new ObjectMapper();
+    Runnable queryStats =
+        () -> {
+          System.out.println("Querying stats from DB.");
+          CommonStats commonStats = getStats(fromEpoch, toEpoch);
+          try {
+            System.out.println("Writing stats to eventOutput.");
+            OutboundEvent.Builder outboundEventBuilder = new OutboundEvent.Builder();
+            // outboundEventBuilder.name("stats");
+            outboundEventBuilder.data(String.class, mapper.writeValueAsString(commonStats));
+            // outboundEventBuilder.data(String.class, "ksdjsaidhsad");
+            eventOutput.write(outboundEventBuilder.build());
+            // Only then the client receives the data :-/ while doing short-polling with XHRs.
+            eventOutput.close();
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        };
+    new Thread(queryStats).start();
+    return eventOutput;
   }
 
   private void gatherTotalTweets(CommonStatsBuilder builder, Long fromEpoch, Long toEpoch) {
