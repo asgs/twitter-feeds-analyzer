@@ -12,21 +12,18 @@ This is only to understand some techniques related to data processing, especiall
 
 <li>
 
-<i>Feed Processor</i> - This will process the feeds from the Kafkat topic and transform into some concrete structure and push to another topic; This could be subscribed by various datastores for persistent storage.
+<i>Feed Processor</i> - This will process the feeds from the Kafka topic and transform into some concrete structure and push to another topic; This could be subscribed to by various datastores for persistent storage.
 
 </li>
 
 <li>
 
-<li>
-
-<i>Stream Processor</i> - This will process the feeds as and when they are streamed in by the feedreader. This is just a stream-processor form of the feedprocessor above.
-
+<i>Stream Processor</i> - This will process the feeds as and when they are streamed in by the feedreader. This is just a in-stream format of the feedprocessor above.
 </li>
 
 <li>
 
-<i>Analyzer Webapp</i> - This is mostly a REST app to serve queries fired from a UI; It will in turn query the database and/or the topic (which contains the processed feeds data) and return JSON data.
+<i>Analyzer Webapp</i> - This is mostly a REST app to serve queries fired from a UI; It will in turn query the database and/or the topic (which contains the processed feeds data) and return JSON data. There's also a simple (but ugly) webpage to display the stats.
 
 </li>
 </ul>
@@ -57,6 +54,8 @@ Make sure the Zookeeper and Kafka services are running and their details are con
 4. To run the REST server, run the script `rest-server.sh` and hit the endpoint `http://localhost:8080/tw-stats` to see some basic common Twitter stats in the form of JSON.
 
 5. To see the Web UI, open the URL `http://localhost:8080/stats`. You can choose to ignore the dates as sensible defaults are chosen (as explained below) and hit the button to see the streaming stats!
+
+Note that **all sh scripts are located under the bin** directory.
 
 <b>Status</b>
 -------------
