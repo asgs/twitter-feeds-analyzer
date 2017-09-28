@@ -54,7 +54,9 @@ Make sure the Zookeeper and Kafka services are running and their details are con
 
 3. Feed Processor is now being **Superseded** by the Stream Processor which does a better job at real-time stream processing. It can be run by invoking the script `stream-processor.sh`.
 
-4. Finally, to run the REST server, run the script `rest-server.sh` and hit the endpoint `http://localhost:8080/tw-stats` to see some basic common Twitter stats.
+4. To run the REST server, run the script `rest-server.sh` and hit the endpoint `http://localhost:8080/tw-stats` to see some basic common Twitter stats in the form of JSON.
+
+5. To see the Web UI, open the URL `http://localhost:8080/stats`. You can choose to ignore the dates as sensible defaults are chosen (as explained below) and hit the button to see the streaming stats!
 
 <b>Status</b>
 -------------
@@ -65,7 +67,7 @@ The basic goal of the project which is, to ingest the twitter feeds, process the
 
 2. <del>The original stream of twitter feeds are pushed on to a Kafka topic, so the moment it's consumed by a subscriber it's gone. To be able to process the original "raw" data at a later point of time, it needs to be persisted in a datastore (preferrably MongoDB as it does support JSON out-of-the-box).</del> **FeedReader** now does JUST that.
 
-3. The stats that are generated are not specific to a time period. So showing stats like who the top Tweeters for the last week are or which language tweeters preferred to tweet the most in 2016 and 2017, etc., are better than showing the same stats without pinning it down to some timeline.
+3. <del>The stats that are generated are not specific to a time period. So showing stats like who the top Tweeters for the last week are or which language tweeters preferred to tweet the most in 2016 and 2017, etc., are better than showing the same stats without pinning it down to some timeline.</del> The UI now shows two Date controls to adjust the timeline. By default, from date is the standard UNIX epoch, while to date is today.
 
-4. Build a simple frontend to visualize the stats and perhaps stream the stats to reflect real-time data. NOT a priority at the moment, though.
+4. <del>Build a simple frontend to visualize the stats and perhaps stream the stats to reflect real-time data. NOT a priority at the moment, though.</del> Using Jersey's Server-sent Events, the client can now receive a stream of text events.
 
