@@ -3,33 +3,52 @@
 <head>
     <script src="ssevent-handler.js" type="text/javascript"></script>
 </head>
-<body onload="getEvents()">
-<div id="closeConnectionDiv">
-    <button id="closeConnection" style="text-align: center; color:red; font-style:bold">Stop Auto-Refresh</button>
+<body>
+<div id="controls">
+    <div id="fromDateDiv">
+        <label for="fromDate">From Date</label>
+        <input type="date" id="fromDate"/>
+    </div>
+    <br/>
+    <div id="toDateDiv">
+        <label for="toDate">To Date</label>
+        <input type="date" id="toDate"/>
+    </div>
+    <br/>
+    <span id="getStatsDiv">
+        <button id="getStats" style="text-align: center; color:green; font-style:bold" onclick="getEvents()">Get Stats
+        </button>
+    </span>
+    <span id="closeConnectionDiv" style="visibility:hidden">
+        <button id="closeConnection" style="text-align: center; color:red; font-style:bold">Stop Auto-Refresh</button>
+    </span>
 </div>
-<div id="totalTweetsDiv" style="border:solid 1px brown">
-    <label for="totalTweets">Total Tweets</label>
-    <div id="totalTweets"></div>
-</div>
-<div id="totalTweetersDiv" style="border:solid 1px brown">
-    <label for="totalTweeters">Total Tweeters</label>
-    <div id="totalTweeters"></div>
-</div>
-<div id="topTenFollowerCountsDiv" style="border:solid 1px brown">
-    <label for="topTenFollowerCounts">Top Ten User Follower Counts</label>
-    <div id="topTenFollowerCounts"></div>
-</div>
-<div id="topTenStatusCountsDiv" style="border:solid 1px brown">
-    <label for="topTenStatusCounts">Top Ten User Status Counts</label>
-    <div id="topTenStatusCounts"></div>
-</div>
-<div id="topTenLanguagesDiv" style="border:solid 1px brown">
-    <label for="topTenLanguages">Top Ten Tweet Languages</label>
-    <div id="topTenLanguages"></div>
-</div>
-<div id="topTenLocationsDiv" style="border:solid 1px brown">
-    <label for="topTenLocations">Top Ten User Locations</label>
-    <div id="topTenLocations"></div>
+<br/>
+<div id="globalStatsDiv" style="visibility:hidden">
+    <div id="totalTweetsDiv" style="border:solid 1px brown">
+        <label for="totalTweets">Total Tweets</label>
+        <div id="totalTweets"></div>
+    </div>
+    <div id="totalTweetersDiv" style="border:solid 1px brown">
+        <label for="totalTweeters">Total Tweeters</label>
+        <div id="totalTweeters"></div>
+    </div>
+    <div id="topTenFollowerCountsDiv" style="border:solid 1px brown">
+        <label for="topTenFollowerCounts">Top Ten User Follower Counts</label>
+        <div id="topTenFollowerCounts"></div>
+    </div>
+    <div id="topTenStatusCountsDiv" style="border:solid 1px brown">
+        <label for="topTenStatusCounts">Top Ten User Status Counts</label>
+        <div id="topTenStatusCounts"></div>
+    </div>
+    <div id="topTenLanguagesDiv" style="border:solid 1px brown">
+        <label for="topTenLanguages">Top Ten Tweet Languages</label>
+        <div id="topTenLanguages"></div>
+    </div>
+    <div id="topTenLocationsDiv" style="border:solid 1px brown">
+        <label for="topTenLocations">Top Ten User Locations</label>
+        <div id="topTenLocations"></div>
+    </div>
 </div>
 </body>
 
